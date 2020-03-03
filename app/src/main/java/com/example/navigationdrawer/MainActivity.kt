@@ -1,6 +1,7 @@
 package com.example.navigationdrawer
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -10,17 +11,27 @@ import nl.psdcompany.duonavigationdrawer.views.DuoMenuView
 import nl.psdcompany.duonavigationdrawer.widgets.DuoDrawerToggle
 import java.util.*
 
+
 class MainActivity : AppCompatActivity(), DuoMenuView.OnMenuClickListener {
 
+    lateinit var mDuoDrawerLayout: DuoDrawerLayout
+    lateinit var mDuoMenuView: DuoMenuView
+    lateinit var mToolbar: Toolbar
     private var mMenuAdapter: MenuAdapter? = null
-    var mViewHolder: ViewHolder? = null
     var mTitles = ArrayList<String>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        mDuoDrawerLayout = findViewById(R.id.drawer) as DuoDrawerLayout
+        mDuoMenuView = mDuoDrawerLayout.menuView as DuoMenuView
+        mToolbar = findViewById(R.id.toolbar) as Toolbar
+        mToolbar.visibility= View.GONE
+
+
         mTitles = ArrayList(Arrays.asList(*resources.getStringArray(R.array.menuOptions)))
-        mViewHolder = ViewHolder()
 
         handleMenu()
         handleDrawer()
@@ -33,19 +44,20 @@ class MainActivity : AppCompatActivity(), DuoMenuView.OnMenuClickListener {
     private fun handleDrawer() {
         val duoDrawerToggle = DuoDrawerToggle(
             this,
-            mViewHolder?.mDuoDrawerLayout,
-            mViewHolder?.mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            mDuoDrawerLayout,
+            mToolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
-
-        mViewHolder?.mDuoDrawerLayout?.setDrawerListener(duoDrawerToggle)
+        mDuoDrawerLayout?.setDrawerListener(duoDrawerToggle)
         duoDrawerToggle.syncState()
 
     }
 
     private fun handleMenu() {
         mMenuAdapter = MenuAdapter(mTitles)
-        mViewHolder?.mDuoMenuView?.setOnMenuClickListener(this)
-        mViewHolder?.mDuoMenuView?.adapter = mMenuAdapter
+        mDuoMenuView.setOnMenuClickListener(this)
+        mDuoMenuView.adapter = mMenuAdapter
     }
 
     override fun onFooterClicked() {
@@ -70,18 +82,7 @@ class MainActivity : AppCompatActivity(), DuoMenuView.OnMenuClickListener {
         when (position) {
             else -> goToFragment(MainFragment(), false)
         }
-        mViewHolder?.mDuoDrawerLayout?.closeDrawer()
+        mDuoDrawerLayout.closeDrawer()
     }
 
-    inner class ViewHolder internal constructor() {
-        val mDuoDrawerLayout: DuoDrawerLayout
-        val mDuoMenuView: DuoMenuView
-        val mToolbar: Toolbar
-
-        init {
-            mDuoDrawerLayout = findViewById(R.id.drawer) as DuoDrawerLayout
-            mDuoMenuView = mDuoDrawerLayout.menuView as DuoMenuView
-            mToolbar = findViewById(R.id.toolbar) as Toolbar
-        }
-    }
 }
